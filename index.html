@@ -2047,13 +2047,16 @@ function renderAreaUnitPage(key){
           <p class="font-mono text-xs text-gray-600">${fmtNum(r)}</p></a>`;}).join('')}
       </div></div>`:''
     }
-    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6">
+    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
       <h2 class="text-base font-semibold text-white mb-1">Convert ${unit.label} to Other Area Units</h2>
       <p class="text-xs text-gray-600 mb-4">Direct conversion pages</p>
       <div class="flex flex-wrap gap-2">
         ${AREA_UNITS.filter(u=>u.key!==key).sort((a,b)=>a.label.localeCompare(b.label)).map(u=>`<a href="/area/${slug(key)}-to-${slug(u.key)}" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-dark-800/60 border border-white/5 text-xs text-gray-400 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">${unit.label} → ${u.label}</a>`).join('')}
       </div>
     </div>
+
+    <!-- FAQ -->
+    ${buildUnitFaqHtml(unit, desc, 'area')}
   </div>`;
   document.getElementById('au-to-label').textContent=areaUnitLabel(getAreaUnit(areaUnitToKey));
   areaUnitRenderConvTable('all'); areaUnitConvert(); areaUnitInitOutsideClick();
@@ -2215,13 +2218,16 @@ function renderAreaConversionPage(fromKey,toKey){
         <button onclick="navigate('/area/${slug(toKey)}')" class="mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Full ${toUnit.label} converter <i class="fa-solid fa-arrow-right text-xs ml-0.5"></i></button>
       </div>
     </div>
-    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6">
+    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
       <h2 class="text-base font-semibold text-white mb-1">Convert ${fromUnit.label} to Other Area Units</h2>
       <p class="text-xs text-gray-600 mb-4">Direct conversion pages from ${fromUnit.label}</p>
       <div class="flex flex-wrap gap-2">
         ${AREA_UNITS.filter(u=>u.key!==fromKey&&u.key!==toKey).sort((a,b)=>a.label.localeCompare(b.label)).map(u=>`<a href="/area/${slug(fromKey)}-to-${slug(u.key)}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-dark-800/60 border border-white/5 text-xs text-gray-400 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">${fromUnit.label} to ${u.label}</a>`).join('')}
       </div>
     </div>
+
+    <!-- FAQ -->
+    ${buildConvFaqHtml(fromUnit, toUnit, factor, convertArea(1, toKey, fromKey), 'area')}
   </div>`;
   window._acpFrom=fromKey;window._acpTo=toKey;acpConvert();
 }
@@ -2681,7 +2687,7 @@ function renderUnitPage(key) {
       </div>` : ''}
 
       <!-- SEO structured list: A to Z conversion pair links -->
-      <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6">
+      <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
         <h2 class="text-base font-semibold text-white mb-1">Convert ${unit.label} to Other Units</h2>
         <p class="text-xs text-gray-600 mb-4">Each link opens a dedicated converter page optimised for that specific conversion</p>
         <div class="flex flex-wrap gap-2">
@@ -2692,6 +2698,9 @@ function renderUnitPage(key) {
             </a>`).join('')}
         </div>
       </div>
+
+      <!-- FAQ -->
+      ${buildUnitFaqHtml(unit, desc, 'length')}
     </div>`;
 
   // Init unit page state
@@ -2827,6 +2836,112 @@ function unitInitOutsideClick() {
       if (chev) chev.classList.remove('rotate-180');
     }
   });
+}
+
+// ================================================================
+//  FAQ HELPERS
+// ================================================================
+function faqItem(q, a) {
+  const id = 'faq-' + Math.random().toString(36).slice(2, 8);
+  return `<div class="border-b border-white/5 last:border-0">
+    <button class="w-full text-left flex items-center justify-between gap-4 py-4 px-1 group"
+      onclick="(function(el){const ans=el.parentElement.querySelector('.faq-ans');const icon=el.querySelector('.faq-icon');const open=ans.classList.toggle('hidden');icon.classList.toggle('rotate-180',!open);})(this)">
+      <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors leading-snug">${q}</span>
+      <i class="fa-solid fa-chevron-down faq-icon text-xs text-indigo-400 flex-shrink-0 transition-transform duration-200"></i>
+    </button>
+    <div class="faq-ans hidden pb-4 px-1">
+      <p class="text-sm text-gray-400 leading-relaxed">${a}</p>
+    </div>
+  </div>`;
+}
+
+function faqSection(items) {
+  return `<div class="rounded-2xl border border-white/8 bg-dark-700/40 p-5 sm:p-6 mb-6">
+    <div class="flex items-center gap-2 mb-5">
+      <i class="fa-solid fa-circle-question text-indigo-400"></i>
+      <h2 class="text-base font-semibold text-white">Frequently Asked Questions</h2>
+    </div>
+    <div>${items.join('')}</div>
+  </div>`;
+}
+
+function buildConvFaqHtml(fromUnit, toUnit, fwdFactor, revFactor, category) {
+  const F = n => fmtNum(n);
+  const fromSym = fromUnit.symbol ? ` (${fromUnit.symbol})` : '';
+  const toSym   = toUnit.symbol   ? ` (${toUnit.symbol})`   : '';
+  const catLabel = category === 'area' ? 'area' : 'length';
+  const items = [
+    faqItem(
+      `How many ${toUnit.label} are in 1 ${fromUnit.label}?`,
+      `1 ${fromUnit.label}${fromSym} is equal to ${F(fwdFactor)} ${toUnit.label}${toSym}. To convert any value, multiply it by ${F(fwdFactor)}.`
+    ),
+    faqItem(
+      `How do I convert ${fromUnit.label} to ${toUnit.label}?`,
+      `To convert ${fromUnit.label} to ${toUnit.label}, multiply the value in ${fromUnit.label} by ${F(fwdFactor)}. Formula: ${toUnit.symbol||toUnit.label} = ${fromUnit.symbol||fromUnit.label} × ${F(fwdFactor)}. For example, 10 ${fromUnit.label} = ${F(fwdFactor * 10)} ${toUnit.label}.`
+    ),
+    faqItem(
+      `How do I convert ${toUnit.label} back to ${fromUnit.label}?`,
+      `To convert ${toUnit.label} to ${fromUnit.label}, multiply by ${F(revFactor)}. So 1 ${toUnit.label} = ${F(revFactor)} ${fromUnit.label}. You can also use the Swap button above.`
+    ),
+    faqItem(
+      `What is the ${fromUnit.label}${fromSym} used for?`,
+      `The ${fromUnit.label} is a unit of ${catLabel}. It is commonly used in ${fromUnit.group === 'metric' ? 'scientific and everyday metric measurements' : fromUnit.group === 'imperial' ? 'imperial and US customary measurement systems' : fromUnit.group === 'astro' ? 'astronomy and space science to express very large distances' : fromUnit.group === 'historical' ? 'historical and traditional measurement contexts' : fromUnit.group === 'scientific' ? 'precision scientific and physics applications' : 'specialised measurement contexts'}.`
+    ),
+    faqItem(
+      `What is the ${toUnit.label}${toSym} used for?`,
+      `The ${toUnit.label} is a unit of ${catLabel}. It is commonly used in ${toUnit.group === 'metric' ? 'scientific and everyday metric measurements' : toUnit.group === 'imperial' ? 'imperial and US customary measurement systems' : toUnit.group === 'astro' ? 'astronomy and space science to express very large distances' : toUnit.group === 'historical' ? 'historical and traditional measurement contexts' : toUnit.group === 'scientific' ? 'precision scientific and physics applications' : 'specialised measurement contexts'}.`
+    ),
+    faqItem(
+      `Is this ${fromUnit.label} to ${toUnit.label} converter accurate?`,
+      `Yes. This converter uses exact conversion factors based on internationally defined ${catLabel} standards. Results are computed in real time with up to 10 significant figures of precision.`
+    ),
+    faqItem(
+      `Can I convert multiple values at once?`,
+      `The live converter above handles one value at a time, but the conversion table on this page shows pre-computed results for common values. For bulk conversions, multiply each value by ${F(fwdFactor)}.`
+    ),
+  ];
+  return faqSection(items);
+}
+
+function buildUnitFaqHtml(unit, desc, category) {
+  const F = n => fmtNum(n);
+  const sym = unit.symbol ? ` (${unit.symbol})` : '';
+  const catLabel = category === 'area' ? 'area' : 'length';
+  const baseUnit = category === 'area' ? 'square meters' : 'meters';
+  const baseConv = category === 'area'
+    ? convertArea(1, unit.key, 'square_meter')
+    : convert(1, unit.key, 'meter');
+  const items = [
+    faqItem(
+      `What is a ${unit.label}?`,
+      `${desc.long || desc.short} The ${unit.label}${sym} is a unit of ${catLabel}${unit.group ? ' in the ' + (unit.group === 'metric' ? 'metric (SI)' : unit.group === 'imperial' ? 'imperial' : unit.group === 'astro' ? 'astronomical' : unit.group === 'historical' ? 'historical' : unit.group === 'scientific' ? 'scientific' : unit.group) + ' system' : ''}.`
+    ),
+    faqItem(
+      `How many ${baseUnit} is 1 ${unit.label}?`,
+      `1 ${unit.label}${sym} = ${F(baseConv)} ${baseUnit}. This is the SI base equivalent of the ${unit.label}.`
+    ),
+    faqItem(
+      `How do I convert ${unit.label} to other ${catLabel} units?`,
+      `Use the Quick Converter above to convert ${unit.label}${sym} to any other ${catLabel} unit in real time. Select your target unit from the dropdown and enter a value. You can also browse all direct conversion pages in the list below.`
+    ),
+    faqItem(
+      `What is the symbol for ${unit.label}?`,
+      unit.symbol
+        ? `The symbol for ${unit.label} is <strong>${unit.symbol}</strong>. You will see this symbol used in formulas, scientific notation, and measurement labels.`
+        : `The ${unit.label} does not have a widely standardised symbol. It is typically written out in full.`
+    ),
+    faqItem(
+      `What are common uses of the ${unit.label}?`,
+      `The ${unit.label} is used in ${unit.group === 'metric' ? 'everyday and scientific measurement worldwide, particularly in countries using the metric system' : unit.group === 'imperial' ? 'the United States, United Kingdom, and other countries that use the imperial or US customary system' : unit.group === 'astro' ? 'astronomy and astrophysics to express vast distances between celestial objects' : unit.group === 'historical' ? 'historical documents, traditional land measurement, and cultural contexts' : unit.group === 'scientific' ? 'physics, chemistry, and precision engineering at very small or specialised scales' : unit.group === 'typography' ? 'typography, publishing, and graphic design for precise text and layout sizing' : unit.group === 'us_survey' ? 'official US land surveying and the Public Land Survey System (PLSS)' : 'specialised measurement contexts'}.`
+    ),
+    faqItem(
+      `Is the ${unit.label} part of the metric system?`,
+      unit.group === 'metric'
+        ? `Yes, the ${unit.label} is part of the International System of Units (SI), the modern metric system used globally in science and most countries.`
+        : `No, the ${unit.label} is not part of the SI metric system. It belongs to the ${unit.group === 'imperial' ? 'imperial / US customary' : unit.group === 'astro' ? 'astronomical' : unit.group === 'historical' ? 'historical' : unit.group === 'scientific' ? 'scientific / non-SI' : unit.group === 'typography' ? 'typographic' : unit.group === 'us_survey' ? 'US survey' : unit.group} system of measurement.`
+    ),
+  ];
+  return faqSection(items);
 }
 
 // ================================================================
@@ -3095,7 +3210,7 @@ function renderConversionPage(fromKey, toKey) {
       </div>
 
       <!-- Other units to toUnit (SEO links) -->
-      <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6">
+      <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
         <h2 class="text-base font-semibold text-white mb-1">Convert Other Length Units to ${toUnit.label}</h2>
         <p class="text-xs text-gray-600 mb-4">Direct conversion pages to ${toUnit.label}</p>
         <div class="flex flex-wrap gap-2">
@@ -3106,6 +3221,9 @@ function renderConversionPage(fromKey, toKey) {
             </a>`).join('')}
         </div>
       </div>
+
+      <!-- FAQ -->
+      ${buildConvFaqHtml(fromUnit, toUnit, factor, convert(1, toKey, fromKey), 'length')}
     </div>`;
 
   // Init converter
