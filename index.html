@@ -348,11 +348,12 @@
           </a>
 
           <!-- Coming soon -->
-          <button onclick="showComingSoon('Volume')"
-            class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-transparent text-left transition-all group hover:bg-white/3">
-            <span class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-600"><i class="fa-solid fa-cube text-xs"></i></span>
-            <div class="flex-1"><p class="text-sm font-medium text-gray-500">Volume</p><p class="soon-badge text-xs text-indigo-500/70">Coming soon</p></div>
-          </button>
+          <a href="/volume" data-cat="volume"
+            class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-transparent text-left transition-all duration-200 group">
+            <span class="nav-icon w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center text-indigo-400"><i class="fa-solid fa-flask text-xs"></i></span>
+            <div class="flex-1 min-w-0"><p class="nav-label text-sm font-medium text-gray-300">Volume</p><p class="text-xs text-gray-600">80+ units</p></div>
+            <i class="fa-solid fa-chevron-right text-xs text-indigo-400/70"></i>
+          </a>
           <button onclick="showComingSoon('Weight / Mass')"
             class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-transparent text-left transition-all group hover:bg-white/3">
             <span class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-600"><i class="fa-solid fa-weight-hanging text-xs"></i></span>
@@ -762,6 +763,178 @@ const AREA_UNIT_DESC = {
   electron_cross_section:{ short:'~6.65 × 10⁻²⁹ m²; the Thomson scattering cross-section.', long:'The electron cross section equals approximately 6.6524615999999 × 10⁻²⁹ square meters — the Thomson scattering cross-section (σₜ = 8π/3 × rₑ²). Used in particle physics.' },
 };
 
+// ================================================================
+//  VOLUME UNIT DATA
+// ================================================================
+const VOLUME_UNITS = [
+  // METRIC
+  { key:'cubic_meter',        label:'Cubic Meter',           symbol:'m³',       factor:1,                    group:'metric' },
+  { key:'cubic_kilometer',    label:'Cubic Kilometer',       symbol:'km³',      factor:1e9,                  group:'metric' },
+  { key:'cubic_centimeter',   label:'Cubic Centimeter',      symbol:'cm³',      factor:1e-6,                 group:'metric' },
+  { key:'cubic_millimeter',   label:'Cubic Millimeter',      symbol:'mm³',      factor:1e-9,                 group:'metric' },
+  { key:'cubic_decimeter',    label:'Cubic Decimeter',       symbol:'dm³',      factor:0.001,                group:'metric' },
+  { key:'liter',              label:'Liter',                 symbol:'L',        factor:0.001,                group:'metric' },
+  { key:'milliliter',         label:'Milliliter',            symbol:'mL',       factor:1e-6,                 group:'metric' },
+  { key:'kiloliter',          label:'Kiloliter',             symbol:'kL',       factor:1,                    group:'metric' },
+  { key:'megaliter',          label:'Megaliter',             symbol:'ML',       factor:1000,                 group:'metric' },
+  { key:'gigaliter',          label:'Gigaliter',             symbol:'GL',       factor:1e6,                  group:'metric' },
+  { key:'teraliter',          label:'Teraliter',             symbol:'TL',       factor:1e9,                  group:'metric' },
+  { key:'petaliter',          label:'Petaliter',             symbol:'PL',       factor:1e12,                 group:'metric' },
+  { key:'exaliter',           label:'Exaliter',              symbol:'EL',       factor:1e15,                 group:'metric' },
+  { key:'hectoliter',         label:'Hectoliter',            symbol:'hL',       factor:0.1,                  group:'metric' },
+  { key:'dekaliter',          label:'Dekaliter',             symbol:'daL',      factor:0.01,                 group:'metric' },
+  { key:'deciliter',          label:'Deciliter',             symbol:'dL',       factor:0.0001,               group:'metric' },
+  { key:'centiliter',         label:'Centiliter',            symbol:'cL',       factor:1e-5,                 group:'metric' },
+  { key:'microliter',         label:'Microliter',            symbol:'µL',       factor:1e-9,                 group:'metric' },
+  { key:'nanoliter',          label:'Nanoliter',             symbol:'nL',       factor:1e-12,                group:'metric' },
+  { key:'picoliter',          label:'Picoliter',             symbol:'pL',       factor:1e-15,                group:'metric' },
+  { key:'femtoliter',         label:'Femtoliter',            symbol:'fL',       factor:1e-18,                group:'metric' },
+  { key:'attoliter',          label:'Attoliter',             symbol:'aL',       factor:1e-21,                group:'metric' },
+  { key:'cup_metric',         label:'Cup (Metric)',          symbol:'',         factor:0.00025,              group:'metric' },
+  { key:'tablespoon_metric',  label:'Tablespoon (Metric)',   symbol:'',         factor:1.5e-5,               group:'metric' },
+  { key:'teaspoon_metric',    label:'Teaspoon (Metric)',     symbol:'',         factor:5e-6,                 group:'metric' },
+  // IMPERIAL / US
+  { key:'cubic_mile',         label:'Cubic Mile',            symbol:'mi³',      factor:4168181825.4406,      group:'imperial' },
+  { key:'cubic_yard',         label:'Cubic Yard',            symbol:'yd³',      factor:0.764554858,          group:'imperial' },
+  { key:'cubic_foot',         label:'Cubic Foot',            symbol:'ft³',      factor:0.0283168466,         group:'imperial' },
+  { key:'cubic_inch',         label:'Cubic Inch',            symbol:'in³',      factor:1.63871e-5,           group:'imperial' },
+  { key:'gallon_us',          label:'Gallon (US)',           symbol:'gal',      factor:0.0037854118,         group:'imperial' },
+  { key:'quart_us',           label:'Quart (US)',            symbol:'qt',       factor:0.0009463529,         group:'imperial' },
+  { key:'pint_us',            label:'Pint (US)',             symbol:'pt',       factor:0.0004731765,         group:'imperial' },
+  { key:'cup_us',             label:'Cup (US)',              symbol:'',         factor:0.0002365882,         group:'imperial' },
+  { key:'fluid_oz_us',        label:'Fluid Ounce (US)',      symbol:'fl oz',    factor:2.95735e-5,           group:'imperial' },
+  { key:'tablespoon_us',      label:'Tablespoon (US)',       symbol:'tbsp',     factor:1.47868e-5,           group:'imperial' },
+  { key:'teaspoon_us',        label:'Teaspoon (US)',         symbol:'tsp',      factor:4.92892159375e-6,     group:'imperial' },
+  { key:'dessertspoon_us',    label:'Dessertspoon (US)',     symbol:'',         factor:9.8578431875e-6,      group:'imperial' },
+  { key:'gill_us',            label:'Gill (US)',             symbol:'gi',       factor:0.0001182941,         group:'imperial' },
+  { key:'minim_us',           label:'Minim (US)',            symbol:'',         factor:6.1611519921875e-8,   group:'imperial' },
+  { key:'dram',               label:'Dram',                  symbol:'dr',       factor:3.6966911953125e-6,   group:'imperial' },
+  { key:'barrel_oil',         label:'Barrel (Oil)',          symbol:'bbl',      factor:0.1589872949,         group:'imperial' },
+  { key:'barrel_us',          label:'Barrel (US)',           symbol:'bbl',      factor:0.1192404712,         group:'imperial' },
+  { key:'ton_register',       label:'Ton Register',          symbol:'ton reg',  factor:2.8316846592,         group:'imperial' },
+  { key:'ccf',                label:'CCF',                   symbol:'ccf',      factor:2.8316846592,         group:'imperial' },
+  { key:'acre_foot',          label:'Acre-Foot',             symbol:'ac·ft',    factor:1233.4818375475,      group:'imperial' },
+  { key:'acre_foot_us',       label:'Acre-Foot (US Survey)', symbol:'',         factor:1233.4892384682,      group:'imperial' },
+  { key:'acre_inch',          label:'Acre-Inch',             symbol:'ac·in',    factor:102.790153129,        group:'imperial' },
+  { key:'board_foot',         label:'Board Foot',            symbol:'',         factor:0.0023597372,         group:'imperial' },
+  { key:'cord',               label:'Cord',                  symbol:'cd',       factor:3.6245563638,         group:'imperial' },
+  { key:'tun',                label:'Tun',                   symbol:'',         factor:0.9539237696,         group:'imperial' },
+  { key:'hogshead',           label:'Hogshead',              symbol:'',         factor:0.2384809424,         group:'imperial' },
+  // UK
+  { key:'gallon_uk',          label:'Gallon (UK)',           symbol:'gal',      factor:0.00454609,           group:'uk' },
+  { key:'quart_uk',           label:'Quart (UK)',            symbol:'qt',       factor:0.0011365225,         group:'uk' },
+  { key:'pint_uk',            label:'Pint (UK)',             symbol:'pt',       factor:0.0005682613,         group:'uk' },
+  { key:'cup_uk',             label:'Cup (UK)',              symbol:'',         factor:0.0002841306,         group:'uk' },
+  { key:'fluid_oz_uk',        label:'Fluid Ounce (UK)',      symbol:'fl oz',    factor:2.84131e-5,           group:'uk' },
+  { key:'tablespoon_uk',      label:'Tablespoon (UK)',       symbol:'',         factor:1.77582e-5,           group:'uk' },
+  { key:'dessertspoon_uk',    label:'Dessertspoon (UK)',     symbol:'',         factor:1.18388e-5,           group:'uk' },
+  { key:'teaspoon_uk',        label:'Teaspoon (UK)',         symbol:'',         factor:5.9193880208333e-6,   group:'uk' },
+  { key:'gill_uk',            label:'Gill (UK)',             symbol:'gi',       factor:0.0001420653,         group:'uk' },
+  { key:'minim_uk',           label:'Minim (UK)',            symbol:'',         factor:5.9193880208333e-8,   group:'uk' },
+  { key:'barrel_uk',          label:'Barrel (UK)',           symbol:'bbl',      factor:0.16365924,           group:'uk' },
+  // SCIENTIFIC / OTHER
+  { key:'cc',                 label:'CC',                    symbol:'cc',       factor:1e-6,                 group:'scientific' },
+  { key:'drop',               label:'Drop',                  symbol:'',         factor:5e-8,                 group:'scientific' },
+  { key:'dekastere',          label:'Dekastere',             symbol:'',         factor:10,                   group:'scientific' },
+  { key:'stere',              label:'Stere',                 symbol:'st',       factor:1,                    group:'scientific' },
+  { key:'decistere',          label:'Decistere',             symbol:'',         factor:0.1,                  group:'scientific' },
+  { key:'earths_volume',      label:"Earth's Volume",        symbol:'',         factor:1.083e21,             group:'scientific' },
+  // HISTORICAL / BIBLICAL
+  { key:'cor_biblical',       label:'Cor (Biblical)',        symbol:'',         factor:0.22,                 group:'historical' },
+  { key:'homer_biblical',     label:'Homer (Biblical)',      symbol:'',         factor:0.22,                 group:'historical' },
+  { key:'bath_biblical',      label:'Bath (Biblical)',       symbol:'',         factor:0.022,                group:'historical' },
+  { key:'hin_biblical',       label:'Hin (Biblical)',        symbol:'',         factor:0.0036666667,         group:'historical' },
+  { key:'cab_biblical',       label:'Cab (Biblical)',        symbol:'',         factor:0.0012222222,         group:'historical' },
+  { key:'log_biblical',       label:'Log (Biblical)',        symbol:'',         factor:0.0003055556,         group:'historical' },
+  { key:'taza_spanish',       label:'Taza (Spanish)',        symbol:'',         factor:0.0002365882,         group:'historical' },
+];
+
+const VOLUME_UNIT_DESC = {
+  cubic_meter:       { short:'The SI unit of volume; 1 m × 1 m × 1 m.', long:'The cubic meter (symbol: m³) is the SI derived unit of volume. It equals the volume of a cube with sides of 1 meter. Widely used in engineering, science, and construction to measure large volumes such as reservoirs, rooms, and cargo.' },
+  cubic_kilometer:   { short:'One billion cubic meters; used for ocean and glacier volumes.', long:'The cubic kilometer (symbol: km³) equals 10⁹ cubic meters. It is used to express large-scale volumes such as glaciers, lakes, and ocean water. The total volume of all Earth\'s oceans is about 1,335,000,000 km³.' },
+  cubic_centimeter:  { short:'One millionth of a cubic meter; equal to 1 mL.', long:'The cubic centimeter (symbol: cm³) equals 10⁻⁶ m³ and is identical to 1 milliliter. It is the standard unit in medicine for dosages, in engine displacement, and in laboratory measurement.' },
+  cubic_millimeter:  { short:'One billionth of a cubic meter; used in precision engineering.', long:'The cubic millimeter (symbol: mm³) equals 10⁻⁹ m³. It is used in precision manufacturing, 3D printing, and medical imaging where very small volumes must be described accurately.' },
+  cubic_decimeter:   { short:'Equal to 1 liter (0.001 m³).', long:'The cubic decimeter (symbol: dm³) equals 0.001 m³ and is numerically identical to the liter. It provides a neat link between the metric length and volume systems.' },
+  liter:             { short:'The most widely used metric volume unit; equal to 1 dm³.', long:'The liter (symbol: L or l) equals 0.001 m³ or 1 cubic decimeter. It is the everyday unit for beverages, fuel, and household measurements worldwide. 1 liter of water has a mass of approximately 1 kilogram at 4°C.' },
+  milliliter:        { short:'One thousandth of a liter; the standard medical dosage unit.', long:'The milliliter (symbol: mL) equals 0.001 liters or 1 cm³. It is the standard unit for liquid medication, cooking ingredients, and laboratory measurements. 1 mL of water weighs approximately 1 gram.' },
+  kiloliter:         { short:'Equal to 1 cubic meter (1,000 liters).', long:'The kiloliter (symbol: kL) equals 1,000 liters or 1 m³. It is used in water supply, agriculture, and industrial processes to measure large liquid volumes. A standard household bathtub holds about 0.15–0.25 kL.' },
+  megaliter:         { short:'One million liters; used for reservoir and dam volumes.', long:'The megaliter (symbol: ML) equals 1,000 m³ or 1,000,000 liters. It is used in water management, irrigation, and hydrology to quantify reservoir storage and large-scale water usage.' },
+  gigaliter:         { short:'One billion liters; used for large-scale water resources.', long:'The gigaliter (symbol: GL) equals 10⁶ m³ or 10⁹ liters. It is used by environmental agencies and governments to measure water stored in large reservoirs and consumed by cities annually.' },
+  teraliter:         { short:'One trillion liters; used in oceanography and hydrology.', long:'The teraliter (symbol: TL) equals 10⁹ m³ or 10¹² liters. Used in large-scale hydrology and oceanographic research to express volumes of major rivers and seas over time.' },
+  petaliter:         { short:'10¹⁵ liters; used for ocean and atmospheric water volumes.', long:'The petaliter (symbol: PL) equals 10¹² m³. This enormous unit is used to express portions of ocean volume and global atmospheric water content.' },
+  exaliter:          { short:'10¹⁸ liters; the largest named metric volume unit in common use.', long:'The exaliter (symbol: EL) equals 10¹⁵ m³. It represents an almost incomprehensibly large volume, occasionally used in earth science to describe total planetary water budgets.' },
+  hectoliter:        { short:'100 liters; the standard unit for beer and wine production.', long:'The hectoliter (symbol: hL) equals 100 liters. It is the standard commercial unit for beer and wine production worldwide. Breweries and wineries measure output in hectoliters.' },
+  dekaliter:         { short:'10 liters; used in some European beverage contexts.', long:'The dekaliter (symbol: daL) equals 10 liters. It appears occasionally in European brewing and agriculture, though less commonly than the liter or hectoliter.' },
+  deciliter:         { short:'100 mL; widely used in European cooking and nutrition.', long:'The deciliter (symbol: dL) equals 100 mL or 0.1 liters. It is commonly used in European recipe measurements (e.g., "2 dL cream") and in clinical medicine for blood component concentrations.' },
+  centiliter:        { short:'10 mL; used for spirit measures and small beverage portions.', long:'The centiliter (symbol: cL) equals 10 mL. It is used to measure spirits and cocktail ingredients, particularly in European bar service where 3–4 cL measures are standard.' },
+  microliter:        { short:'One millionth of a liter; the standard laboratory pipetting unit.', long:'The microliter (symbol: µL) equals 10⁻⁶ liters or 10⁻⁹ m³. It is the standard unit for laboratory pipettes, PCR reactions, and bioassays where tiny precise volumes are required.' },
+  nanoliter:         { short:'One billionth of a liter; used in microfluidics and genomics.', long:'The nanoliter (symbol: nL) equals 10⁻⁹ liters. It is used in microfluidics, high-throughput drug screening, and genomics where reactions occur in nanoscale volumes.' },
+  picoliter:         { short:'10⁻¹² liters; the scale of inkjet printer droplets.', long:'The picoliter (symbol: pL) equals 10⁻¹² liters. Each droplet from an inkjet printer nozzle is typically 1–30 picoliters. It is also used in single-cell biology and fluorescence assays.' },
+  femtoliter:        { short:'10⁻¹⁵ liters; the volume of a single biological cell.', long:'The femtoliter (symbol: fL) equals 10⁻¹⁵ liters. A red blood cell has a volume of about 90 fL. It is the standard unit in hematology for reporting mean corpuscular volume (MCV).' },
+  attoliter:         { short:'10⁻¹⁸ liters; used in nanoscale science and nanofluidics.', long:'The attoliter (symbol: aL) equals 10⁻¹⁸ liters. It is used in nanotechnology, nanofluidics, and single-molecule detection experiments where ultra-small volumes are studied.' },
+  cup_metric:        { short:'250 mL; the metric cup used in Australian recipes.', long:'The metric cup equals exactly 250 mL (0.25 L). It is the official standard in Australia and is used in many international recipe standards. Not to be confused with the US cup (≈ 236.6 mL).' },
+  tablespoon_metric: { short:'15 mL; the international metric tablespoon.', long:'The metric tablespoon equals exactly 15 mL. It is the standard tablespoon in Australia, New Zealand, the UK, and many other countries. The US tablespoon is slightly smaller at ≈ 14.79 mL.' },
+  teaspoon_metric:   { short:'5 mL; the international metric teaspoon.', long:'The metric teaspoon equals exactly 5 mL. It is the standard teaspoon measurement in most countries and is used universally in pharmaceutical dosing (e.g., "one teaspoon = 5 mL").' },
+  cubic_mile:        { short:'The volume of a cube 1 mile on each side; ~4.168 km³.', long:'The cubic mile (symbol: mi³) equals approximately 4,168,181,825 m³ or about 4.168 km³. It is used to describe volumes of glaciers, lakes, and oceanic flows. The Great Lakes contain roughly 5,439 cubic miles of water.' },
+  cubic_yard:        { short:'~0.765 m³; used in concrete and earthwork measurement.', long:'The cubic yard (symbol: yd³) equals approximately 0.7646 m³. It is the standard unit for ordering concrete, soil, gravel, and mulch in the United States. One cubic yard of concrete weighs approximately 4,000 lbs.' },
+  cubic_foot:        { short:'~28.3 liters; used in building, HVAC, and natural gas.', long:'The cubic foot (symbol: ft³) equals approximately 28.317 liters. It is used in construction for building volumes, in HVAC for airflow measurement, and by utility companies to measure natural gas consumption.' },
+  cubic_inch:        { short:'~16.39 mL; used for engine displacement in US/UK.', long:'The cubic inch (symbol: in³) equals approximately 16.387 mL. Engine displacement is commonly expressed in cubic inches in the United States — a 350 cubic inch V8 engine displaces about 5.7 liters.' },
+  gallon_us:         { short:'3.785 liters; the standard US liquid measure for fuel and milk.', long:'The US gallon (symbol: gal) equals exactly 231 cubic inches or approximately 3.785 liters. It is the standard unit for fuel, milk, and large liquid volumes in the United States. Note: the US gallon is smaller than the UK imperial gallon (4.546 L).' },
+  quart_us:          { short:'~0.946 liters; one quarter of a US gallon.', long:'The US quart (symbol: qt) equals 1/4 US gallon or approximately 0.946 liters. It is commonly used in US recipes for liquids like broth, juice, and ice cream container sizes.' },
+  pint_us:           { short:'~473 mL; the standard US beer measure.', long:'The US pint (symbol: pt) equals 1/2 US quart or approximately 473.2 mL. It is the standard serving size for beer at US bars and restaurants. Note: the US pint is smaller than the UK pint (568 mL).' },
+  cup_us:            { short:'~236.6 mL; the standard US recipe cup.', long:'The US cup equals approximately 236.588 mL. It is the universal unit for recipe measurement in American cookbooks, equal to 8 US fluid ounces or 1/2 US pint.' },
+  fluid_oz_us:       { short:'~29.57 mL; the US unit for drink portions and nutrition labels.', long:'The US fluid ounce (symbol: fl oz) equals approximately 29.574 mL. It is used on US nutrition labels, in cocktail recipes, and for measuring beverages. Note: the UK fluid ounce is slightly larger at ≈ 28.41 mL.' },
+  tablespoon_us:     { short:'~14.79 mL; equal to 3 US teaspoons.', long:'The US tablespoon equals approximately 14.787 mL (3 US teaspoons or 1/2 US fluid ounce). It is the standard recipe tablespoon in American cookbooks.' },
+  teaspoon_us:       { short:'~4.93 mL; the smallest standard US recipe measure.', long:'The US teaspoon equals approximately 4.929 mL. It is the smallest standard volume in US cooking measurement. Three US teaspoons equal one US tablespoon.' },
+  dessertspoon_us:   { short:'~9.86 mL; 2 US teaspoons.', long:'The US dessertspoon equals approximately 9.858 mL (2 US teaspoons). It is a traditional recipe measure used in some older American cookbooks but less common than the tablespoon and teaspoon today.' },
+  gill_us:           { short:'~118.3 mL; a quarter US pint.', long:'The US gill (symbol: gi) equals 1/4 US pint or approximately 118.29 mL. It is a traditional unit used historically for spirits in the United States.' },
+  minim_us:          { short:'~0.0616 mL; the smallest US liquid measure.', long:'The US minim equals approximately 0.0616 mL. It is a pharmacy unit, historically 1/480 of a US fluid ounce. Used in old prescriptions but largely replaced by the milliliter in modern medicine.' },
+  dram:              { short:'~3.70 mL; a traditional pharmacy volume unit.', long:'The fluid dram (symbol: dr) equals approximately 3.697 mL (1/8 US fluid ounce). It has been used in pharmacy since medieval times and is the origin of the modern "dram" glass of spirits.' },
+  barrel_oil:        { short:'~158.99 liters; the global standard for crude oil.', long:'The oil barrel (symbol: bbl) equals exactly 42 US gallons or approximately 158.987 liters. It is the international standard unit for crude oil pricing and production measurement. Daily oil production is reported in millions of barrels per day (Mb/d).' },
+  barrel_us:         { short:'~119.24 liters; the US beer/liquid barrel.', long:'The US barrel equals 31.5 US gallons or approximately 119.24 liters. It is the standard unit for beer and malt beverages in the United States for wholesale and taxation purposes.' },
+  ton_register:      { short:'~2.832 m³; a unit of ship cargo capacity.', long:'The ton register (symbol: ton reg) equals 100 cubic feet or approximately 2.832 m³. It is used in marine engineering to measure the internal capacity of ships. Gross tonnage is related to this unit.' },
+  ccf:               { short:'100 cubic feet (~2.832 m³); used for natural gas billing.', long:'CCF (hundred cubic feet) equals 100 ft³ or approximately 2.832 m³. It is widely used by US utility companies to bill natural gas consumption. 1 CCF ≈ 1.02 therms of natural gas energy.' },
+  acre_foot:         { short:'~1,233 m³; the standard US water supply unit.', long:'The acre-foot (symbol: ac·ft) equals the volume of water covering 1 acre to a depth of 1 foot, approximately 1,233.48 m³ or 325,851 US gallons. It is the standard unit for measuring large water supply volumes in the western United States.' },
+  acre_foot_us:      { short:'~1,233.49 m³; acre-foot based on US survey foot.', long:'The US survey acre-foot equals approximately 1,233.489 m³. It differs slightly from the standard acre-foot due to the use of the US survey foot rather than the international foot. Used in official US land survey calculations.' },
+  acre_inch:         { short:'~102.79 m³; one twelfth of an acre-foot.', long:'The acre-inch equals 1/12 of an acre-foot or approximately 102.79 m³ (27,154 US gallons). It is used in irrigation and water supply management to measure smaller water volumes.' },
+  board_foot:        { short:'~2.36 liters; the unit for lumber volume.', long:'The board foot equals the volume of a 1-foot × 1-foot × 1-inch piece of lumber, or approximately 2.36 liters. It is the standard unit for measuring and pricing lumber in the United States and Canada.' },
+  cord:              { short:'~3.62 m³; a standard unit for firewood volume.', long:'The cord (symbol: cd) equals 128 cubic feet or approximately 3.625 m³. It is the standard unit for firewood in the United States, representing a stack of wood 4 ft × 4 ft × 8 ft.' },
+  tun:               { short:'~953.9 liters; a large wine cask measure.', long:'The tun equals approximately 953.9 liters (252 US gallons). It was the largest standard wine cask in the medieval English trade system and is the origin of the word "tunnel" (a large barrel).' },
+  hogshead:          { short:'~238.5 liters; a traditional barrel for wine and spirits.', long:'The hogshead equals approximately 238.5 liters (63 US gallons). It was traditionally used for shipping wine, beer, and tobacco. A hogshead of bourbon whiskey is still a common aging vessel in distilleries.' },
+  gallon_uk:         { short:'~4.546 liters; the larger British imperial gallon.', long:'The UK imperial gallon equals exactly 4.54609 liters, about 20% larger than the US gallon. It is the legal measure for fuel in the United Kingdom. 1 UK gallon = 8 UK pints = 160 UK fluid ounces.' },
+  quart_uk:          { short:'~1.136 liters; one quarter of a UK gallon.', long:'The UK quart equals approximately 1.137 liters. It is 1/4 of an imperial gallon. Though largely replaced by metric measures, it persists in some British recipes and historical references.' },
+  pint_uk:           { short:'~568 mL; the British beer measure, larger than the US pint.', long:'The UK pint equals approximately 568.26 mL, significantly larger than the US pint (473.2 mL). It is the legal standard serving for beer and cider in UK pubs.' },
+  cup_uk:            { short:'~284.1 mL; half a UK pint.', long:'The UK cup equals approximately 284.1 mL (1/2 UK pint). It is used in traditional British recipes and differs from both the US cup (236.6 mL) and the metric cup (250 mL).' },
+  fluid_oz_uk:       { short:'~28.41 mL; the British fluid ounce, slightly smaller than US.', long:'The UK fluid ounce equals approximately 28.413 mL, slightly smaller than the US fluid ounce (29.574 mL). It equals 1/20 of a UK pint and is used in British recipes and drinks measurement.' },
+  tablespoon_uk:     { short:'~17.76 mL; slightly larger than metric and US tablespoons.', long:'The UK tablespoon equals approximately 17.758 mL. Traditional British recipes use this measure, though many modern UK recipes now use the 15 mL metric tablespoon.' },
+  dessertspoon_uk:   { short:'~11.84 mL; a British recipe measure between tbsp and tsp.', long:'The UK dessertspoon equals approximately 11.839 mL (2 UK teaspoons). It is a traditional British recipe measure used for medium portions of liquid ingredients.' },
+  teaspoon_uk:       { short:'~5.92 mL; the traditional British teaspoon.', long:'The UK teaspoon equals approximately 5.919 mL, slightly larger than the metric teaspoon (5 mL) and US teaspoon (4.93 mL). Traditional British recipes use this measure.' },
+  gill_uk:           { short:'~142.1 mL; a quarter UK pint; the legal UK spirits measure.', long:'The UK gill equals 1/4 UK pint or approximately 142.07 mL. In Scotland and Ireland, a gill (or half-gill of about 71 mL) is the standard pub measure for spirits.' },
+  minim_uk:          { short:'~0.0592 mL; the smallest UK pharmacy unit.', long:'The UK minim equals approximately 0.05919 mL, defined as 1/480 of a UK fluid ounce. Like the US minim, it was used historically in pharmacy prescriptions before metrication.' },
+  barrel_uk:         { short:'~163.7 liters; the British imperial barrel.', long:'The UK barrel equals approximately 163.66 liters (36 UK gallons). It was used traditionally for beer, ale, and other liquids in British commerce. The brewery barrel is still used for taxation purposes in the UK.' },
+  cc:                { short:'Cubic centimeter; identical to 1 mL; widely used in medicine.', long:'CC (cubic centimeter, symbol: cc or cm³) equals exactly 1 milliliter. It is the standard unit for injections and IV fluids in medicine. "Give 10 cc of saline" is synonymous with "give 10 mL of saline."' },
+  drop:              { short:'~0.05 mL; an informal unit for liquid drops.', long:'The drop equals approximately 0.05 mL (50 µL). The exact volume varies by liquid viscosity and dropper size, but 20 drops per mL is a common pharmaceutical approximation (20 gtt/mL). Used in eye drops, tinctures, and essential oils.' },
+  dekastere:         { short:'10 m³; ten steres; used for timber volume.', long:'The dekastere equals 10 m³. Along with the stere and decistere, it is used in some European countries to measure firewood and timber volume.' },
+  stere:             { short:'1 m³; used for wood and timber in some European countries.', long:'The stere (symbol: st) equals exactly 1 m³. It is used in France, Italy, and other European countries as an alternative to the cubic meter for measuring firewood and timber.' },
+  decistere:         { short:'0.1 m³; one tenth of a stere.', long:'The decistere equals 0.1 m³ or 100 liters. It is a subdivision of the stere used in European timber measurement.' },
+  earths_volume:     { short:"Earth's total volume; ~1.083 × 10²¹ m³.", long:"Earth's volume equals approximately 1.083 × 10²¹ m³. This astronomical unit of volume is used in planetary science to compare the sizes of other planets and solar system bodies. Jupiter has a volume about 1,321 times that of Earth." },
+  cor_biblical:      { short:'~220 liters; the largest Biblical dry/liquid measure.', long:'The cor (also called homer) is the largest unit in the Biblical Hebrew measurement system, equal to approximately 220 liters. It appears in the Hebrew Bible and Talmud for measuring grain, oil, and wine.' },
+  homer_biblical:    { short:'~220 liters; equal to the cor; the Biblical homer.', long:'The homer is identical to the cor in Biblical measurement, equal to approximately 220 liters. It was the largest unit of capacity in ancient Israel and represents a donkey load of grain or liquid.' },
+  bath_biblical:     { short:'~22 liters; one tenth of a cor (Biblical liquid measure).', long:'The bath is a Biblical unit of liquid volume equal to approximately 22 liters, or 1/10 of a cor. It is mentioned multiple times in the Hebrew Bible for measuring wine and oil.' },
+  hin_biblical:      { short:'~3.67 liters; one sixth of a bath (Biblical measure).', long:'The hin equals approximately 3.667 liters (1/6 bath). It is a Biblical unit of liquid measure used for oil and wine in Temple offerings. The word may derive from the ancient Egyptian unit "hnw."' },
+  cab_biblical:      { short:'~1.22 liters; a small Biblical dry and liquid measure.', long:'The cab (also spelled qab) equals approximately 1.222 liters (1/18 of a bath). It is one of the smaller units in the Biblical Hebrew system, referenced in the Books of Kings and Ezekiel.' },
+  log_biblical:      { short:'~0.306 liters; the smallest Biblical liquid unit.', long:'The log equals approximately 0.306 liters (1/4 cab). It is the smallest unit of liquid measurement in the Hebrew Bible, mentioned in Leviticus in connection with oil used in ritual purification.' },
+  taza_spanish:      { short:'~236.6 mL; the Spanish taza, equal to 1 US cup.', long:'The taza (Spanish cup) equals approximately 236.588 mL, numerically identical to the US cup. It is used in Spanish-language cookbooks and Latin American recipes as the standard cup measure.' },
+};
+
+const VOLUME_GROUP_META = {
+  metric:    { label:'Metric',    color:'bg-blue-500/15 text-blue-400',    icon:'fa-flask' },
+  imperial:  { label:'Imperial',  color:'bg-amber-500/15 text-amber-400',  icon:'fa-flag' },
+  uk:        { label:'UK',        color:'bg-rose-500/15 text-rose-400',    icon:'fa-crown' },
+  scientific:{ label:'Scientific',color:'bg-violet-500/15 text-violet-400',icon:'fa-atom' },
+  historical:{ label:'Historical',color:'bg-emerald-500/15 text-emerald-400',icon:'fa-scroll' },
+};
+
 // Area Group metadata
 const AREA_GROUP_META = {
   metric:    { label:'Metric',     color:'bg-blue-500/15 text-blue-400',    icon:'fa-flask' },
@@ -798,6 +971,15 @@ function getAreaUnit(key) { return AREA_UNITS.find(u => u.key === key); }
 function convertArea(value, fromKey, toKey) {
   const from = getAreaUnit(fromKey);
   const to   = getAreaUnit(toKey);
+  if (!from || !to || !isFinite(value)) return NaN;
+  return (value * from.factor) / to.factor;
+}
+
+function getVolumeUnit(key) { return VOLUME_UNITS.find(u => u.key === key); }
+
+function convertVolume(value, fromKey, toKey) {
+  const from = getVolumeUnit(fromKey);
+  const to   = getVolumeUnit(toKey);
   if (!from || !to || !isFinite(value)) return NaN;
   return (value * from.factor) / to.factor;
 }
@@ -946,6 +1128,14 @@ function getRoute() {
     return { view: 'area_unit', key: keyFromSlug(parts[1]) };
   }
   if (parts[0] === 'area') return { view: 'area' };
+  // /volume/liter-to-gallon-us
+  if (parts[0] === 'volume' && parts[1]) {
+    const conv = splitConvSlug(parts[1]);
+    if (conv && conv.from && conv.to)
+      return { view: 'vol_conv', fromKey: keyFromSlug(conv.from), toKey: keyFromSlug(conv.to) };
+    return { view: 'vol_unit', key: keyFromSlug(parts[1]) };
+  }
+  if (parts[0] === 'volume') return { view: 'volume' };
   if (parts[0] === 'about') return { view: 'about' };
   if (parts[0] === 'site-owners') return { view: 'site_owners' };
   return { view: 'landing' };
@@ -968,6 +1158,10 @@ function router() {
   if (route.view === 'area_conv') { const f=getAreaUnit(route.fromKey),t=getAreaUnit(route.toKey); if(f&&t){renderAreaConversionPage(route.fromKey,route.toKey);return;} }
   if (route.view === 'area_unit') { if(getAreaUnit(route.key)){renderAreaUnitPage(route.key);return;} }
   if (route.view === 'area') { renderAreaPage(); return; }
+  // Volume routes
+  if (route.view === 'vol_conv') { const f=getVolumeUnit(route.fromKey),t=getVolumeUnit(route.toKey); if(f&&t){renderVolumeConversionPage(route.fromKey,route.toKey);return;} }
+  if (route.view === 'vol_unit') { if(getVolumeUnit(route.key)){renderVolumeUnitPage(route.key);return;} }
+  if (route.view === 'volume') { renderVolumePage(); return; }
   if (route.view === 'about') { renderAboutPage(); return; }
   if (route.view === 'site_owners') { renderSiteOwnersPage(); return; }
   renderLandingPage();
@@ -1238,7 +1432,7 @@ function renderLandingPage() {
             <p class="text-xs text-indigo-400">90+ units active</p>
           </a>
           <a href="/area" class="group rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-600/10 to-violet-600/5 p-4 sm:p-5 text-left hover:border-indigo-500/50 hover:scale-[1.02] transition-all"><div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center mb-3 group-hover:bg-indigo-500/25 transition-colors"><i class="fa-solid fa-vector-square text-indigo-400"></i></div><p class="text-sm font-semibold text-white mb-0.5">Area</p><p class="text-xs text-indigo-400">40+ units active</p></a>
-          <div class="rounded-2xl border border-white/5 bg-dark-800/30 p-4 sm:p-5 opacity-50 cursor-not-allowed"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3"><i class="fa-solid fa-cube text-gray-600"></i></div><p class="text-sm font-medium text-gray-500 mb-0.5">Volume</p><p class="text-xs text-gray-700">Coming soon</p></div>
+          <a href="/volume" class="group rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-600/10 to-violet-600/5 p-4 sm:p-5 text-left hover:border-indigo-500/50 hover:scale-[1.02] transition-all"><div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center mb-3 group-hover:bg-indigo-500/25 transition-colors"><i class="fa-solid fa-flask text-indigo-400"></i></div><p class="text-sm font-semibold text-white mb-0.5">Volume</p><p class="text-xs text-indigo-400">80+ units active</p></a>
           <div class="rounded-2xl border border-white/5 bg-dark-800/30 p-4 sm:p-5 opacity-50 cursor-not-allowed"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3"><i class="fa-solid fa-weight-hanging text-gray-600"></i></div><p class="text-sm font-medium text-gray-500 mb-0.5">Weight</p><p class="text-xs text-gray-700">Coming soon</p></div>
           <div class="rounded-2xl border border-white/5 bg-dark-800/30 p-4 sm:p-5 opacity-50 cursor-not-allowed"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3"><i class="fa-solid fa-temperature-half text-gray-600"></i></div><p class="text-sm font-medium text-gray-500 mb-0.5">Temperature</p><p class="text-xs text-gray-700">Coming soon</p></div>
           <div class="rounded-2xl border border-white/5 bg-dark-800/30 p-4 sm:p-5 opacity-50 cursor-not-allowed"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3"><i class="fa-solid fa-gauge-high text-gray-600"></i></div><p class="text-sm font-medium text-gray-500 mb-0.5">Speed</p><p class="text-xs text-gray-700">Coming soon</p></div>
@@ -1712,6 +1906,541 @@ function homeInitOutsideClick() {
     });
   });
 }
+
+// ================================================================
+//  VOLUME CONVERTER PAGE
+// ================================================================
+let volFromKey = 'liter';
+let volToKey   = 'gallon_us';
+let volGroup   = 'all';
+
+function renderVolumePage() {
+  updateNavActive('volume');
+  updateSEO({
+    title: 'Volume Converter — 80+ Units | Omni Converter',
+    description: 'Free online volume converter. Convert between 80+ units including metric, imperial, UK, and historical volume units. Instant results.',
+    url: 'https://www.omniconverter.cyou/volume'
+  });
+  const root = document.getElementById('app-root');
+  root.innerHTML = `
+    <div class="page-fade">
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-2 justify-between">
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">
+            <i class="fa-solid fa-flask text-xs"></i> Volume
+          </span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Volume Converter</h2>
+        <p class="text-gray-500 text-sm mt-1">Convert between 80+ volume units — metric, imperial, UK, historical &amp; more.</p>
+      </div>
+
+      <div class="rounded-2xl border border-white/8 bg-dark-700/60 backdrop-blur-sm shadow-glow p-4 sm:p-6 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">From</label>
+            <div class="relative">
+              <input id="vol-from-value" type="text" inputmode="decimal" value="1" step="any"
+                class="converter-input w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-xl font-semibold text-white font-mono transition-all hover:border-indigo-500/30"
+                placeholder="Enter value" oninput="volConvert()" />
+              <button onclick="volClear()" id="vol-clear-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors hidden">
+                <i class="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">From Unit</label>
+            <div id="vol-from-wrap">
+              <button id="vol-from-btn" onclick="volToggleDrop('from')"
+                class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white text-left flex items-center justify-between hover:border-indigo-500/30 transition-all">
+                <span id="vol-from-label"></span>
+                <i class="fa-solid fa-chevron-down text-indigo-400 text-xs transition-transform duration-200" id="vol-from-chev"></i>
+              </button>
+              <div id="vol-from-drop" class="unit-drop-panel mt-1 rounded-xl border border-white/10 bg-dark-800/98 backdrop-blur-xl shadow-xl overflow-hidden">
+                <div class="p-2 border-b border-white/5"><input id="vol-from-search" type="text" placeholder="Search units…" class="w-full bg-dark-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 border border-white/5 focus:outline-none focus:border-indigo-500/40" oninput="volBuildList('from')" /></div>
+                <div id="vol-from-list" class="search-dropdown py-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-center my-4">
+          <button onclick="volSwap()" class="swap-btn group flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-600/15 border border-indigo-500/25 text-indigo-400 text-sm font-medium hover:bg-indigo-600/25 hover:border-indigo-500/50 transition-all">
+            <i class="fa-solid fa-arrow-right-arrow-left swap-icon text-xs"></i>Swap Units
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">To</label>
+            <div class="relative">
+              <input id="vol-to-value" type="text" readonly
+                class="converter-input w-full bg-dark-800/60 border border-white/8 rounded-xl px-4 py-3 text-xl font-semibold text-indigo-300 font-mono cursor-default" placeholder="Result" />
+              <button onclick="volCopy()" title="Copy result" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-indigo-400 transition-colors">
+                <i class="fa-regular fa-copy text-sm" id="vol-copy-icon"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">To Unit</label>
+            <div id="vol-to-wrap">
+              <button id="vol-to-btn" onclick="volToggleDrop('to')"
+                class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white text-left flex items-center justify-between hover:border-indigo-500/30 transition-all">
+                <span id="vol-to-label"></span>
+                <i class="fa-solid fa-chevron-down text-indigo-400 text-xs transition-transform duration-200" id="vol-to-chev"></i>
+              </button>
+              <div id="vol-to-drop" class="unit-drop-panel mt-1 rounded-xl border border-white/10 bg-dark-800/98 backdrop-blur-xl shadow-xl overflow-hidden">
+                <div class="p-2 border-b border-white/5"><input id="vol-to-search" type="text" placeholder="Search units…" class="w-full bg-dark-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 border border-white/5 focus:outline-none focus:border-indigo-500/40" oninput="volBuildList('to')" /></div>
+                <div id="vol-to-list" class="search-dropdown py-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-dark-800/80 border border-white/5 text-xs text-gray-500">
+          <i class="fa-solid fa-function text-indigo-500/60 flex-shrink-0"></i>
+          <span id="vol-formula-text" class="font-mono truncate"></span>
+        </div>
+      </div>
+
+      <!-- UNITS GRID -->
+      <div class="rounded-2xl border border-white/8 bg-dark-700/40 backdrop-blur-sm overflow-hidden mb-6">
+        <div class="p-4 sm:p-5 border-b border-white/5 flex flex-wrap items-center justify-between gap-3">
+          <div><h2 class="text-base font-semibold text-white">All Volume Units</h2><p class="text-xs text-gray-600 mt-0.5">Click any unit to open its dedicated converter page</p></div>
+          <div class="flex flex-wrap gap-1.5" id="vol-group-tabs">
+            <button onclick="volFilterGroup('all')" data-group="all" class="vgtab active text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all">All</button>
+            <button onclick="volFilterGroup('metric')" data-group="metric" class="vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Metric</button>
+            <button onclick="volFilterGroup('imperial')" data-group="imperial" class="vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Imperial</button>
+            <button onclick="volFilterGroup('uk')" data-group="uk" class="vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">UK</button>
+            <button onclick="volFilterGroup('historical')" data-group="historical" class="vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Historical</button>
+            <button onclick="volFilterGroup('scientific')" data-group="scientific" class="vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Scientific</button>
+          </div>
+        </div>
+        <div class="px-4 sm:px-5 py-3 border-b border-white/5">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
+            <input id="vol-unit-grid-search" type="text" placeholder="Search units…"
+              class="w-full bg-dark-800/60 rounded-lg pl-8 pr-4 py-2 text-sm text-white placeholder-gray-600 border border-white/5 focus:outline-none focus:border-indigo-500/30 transition-colors"
+              oninput="volRenderGrid()" />
+          </div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div id="vol-unit-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+          <p class="text-xs text-gray-600 mt-3" id="vol-grid-count"></p>
+        </div>
+      </div>
+
+      <!-- QUICK REF TABLE -->
+      <div class="rounded-2xl border border-white/8 bg-dark-700/40 backdrop-blur-sm overflow-hidden mb-6">
+        <div class="p-4 sm:p-5 border-b border-white/5"><h2 class="text-base font-semibold text-white">Quick Reference Table</h2><p class="text-xs text-gray-600 mt-0.5">All conversions relative to your current input</p></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-white/5">
+              <th class="text-left px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit</th>
+              <th class="text-left px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Group</th>
+              <th class="text-right px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Value</th>
+              <th class="px-3 py-3 w-10"></th>
+            </tr></thead>
+            <tbody id="vol-ref-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('vol-from-label').textContent = volUnitLabel(getVolumeUnit(volFromKey));
+  document.getElementById('vol-to-label').textContent   = volUnitLabel(getVolumeUnit(volToKey));
+  volConvert(); volRenderGrid(); volRenderTable(); volInitOutsideClick();
+}
+
+function volUnitLabel(u) { return u.label + (u.symbol ? ' [' + u.symbol + ']' : ''); }
+
+function volConvert() {
+  const raw = parseFloat(document.getElementById('vol-from-value').value);
+  const val = isNaN(raw) ? 0 : raw;
+  document.getElementById('vol-to-value').value = fmtNum(convertVolume(val, volFromKey, volToKey));
+  document.getElementById('vol-formula-text').textContent = `1 ${getVolumeUnit(volFromKey).label} = ${fmtNum(convertVolume(1,volFromKey,volToKey))} ${getVolumeUnit(volToKey).label}`;
+  const cb = document.getElementById('vol-clear-btn');
+  if (cb) cb.classList.toggle('hidden', !document.getElementById('vol-from-value').value);
+  volRenderTable();
+}
+function volClear() { document.getElementById('vol-from-value').value=''; document.getElementById('vol-from-value').focus(); volConvert(); }
+function volCopy() {
+  const val=document.getElementById('vol-to-value').value; if(!val||val==='—')return;
+  navigator.clipboard.writeText(val).catch(()=>{});
+  const icon=document.getElementById('vol-copy-icon'); icon.className='fa-solid fa-circle-check text-emerald-400 text-sm';
+  showToast('Result copied to clipboard'); setTimeout(()=>{icon.className='fa-regular fa-copy text-sm';},2000);
+}
+function volSwap() {
+  const tmp=volFromKey; volFromKey=volToKey; volToKey=tmp;
+  document.getElementById('vol-from-label').textContent=volUnitLabel(getVolumeUnit(volFromKey));
+  document.getElementById('vol-to-label').textContent=volUnitLabel(getVolumeUnit(volToKey));
+  const tv=document.getElementById('vol-to-value').value;
+  if(tv&&tv!=='—')document.getElementById('vol-from-value').value=tv;
+  volConvert(); volRenderGrid();
+}
+function volToggleDrop(side) {
+  const drop=document.getElementById('vol-'+side+'-drop'), chev=document.getElementById('vol-'+side+'-chev');
+  const isOpen=drop.classList.contains('open');
+  ['from','to'].forEach(s=>{document.getElementById('vol-'+s+'-drop').classList.remove('open');document.getElementById('vol-'+s+'-chev').classList.remove('rotate-180');const si=document.getElementById('vol-'+s+'-search');if(si)si.value='';});
+  if(!isOpen){drop.classList.add('open');chev.classList.add('rotate-180');volBuildList(side);setTimeout(()=>document.getElementById('vol-'+side+'-search').focus(),50);}
+}
+function volBuildList(side) {
+  const q=(document.getElementById('vol-'+side+'-search').value||'').toLowerCase();
+  const con=document.getElementById('vol-'+side+'-list'); con.innerHTML='';
+  const groups=['metric','imperial','uk','scientific','historical']; const grouped={}; groups.forEach(g=>grouped[g]=[]);
+  VOLUME_UNITS.filter(u=>!q||u.label.toLowerCase().includes(q)).forEach(u=>{if(grouped[u.group])grouped[u.group].push(u);});
+  let any=false;
+  groups.forEach(g=>{if(!grouped[g].length)return;any=true;
+    const meta=VOLUME_GROUP_META[g];const hd=document.createElement('div');hd.className='px-3 pt-2 pb-1';
+    hd.innerHTML=`<span class="text-xs font-semibold uppercase tracking-widest ${meta.color.split(' ')[1]} opacity-70">${meta.label}</span>`;con.appendChild(hd);
+    grouped[g].forEach(u=>{const cur=(side==='from'?volFromKey:volToKey)===u.key;
+      const btn=document.createElement('button');btn.className=`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-indigo-500/10 ${cur?'text-indigo-400 bg-indigo-500/8 font-medium':'text-gray-300'}`;
+      btn.textContent=volUnitLabel(u);btn.onclick=()=>volSelectUnit(side,u.key);con.appendChild(btn);});});
+  if(!any)con.innerHTML='<div class="px-3 py-4 text-sm text-gray-600 text-center">No units found</div>';
+}
+function volSelectUnit(side,key){
+  if(side==='from'){volFromKey=key;document.getElementById('vol-from-label').textContent=volUnitLabel(getVolumeUnit(key));}
+  else{volToKey=key;document.getElementById('vol-to-label').textContent=volUnitLabel(getVolumeUnit(key));}
+  document.getElementById('vol-'+side+'-drop').classList.remove('open');document.getElementById('vol-'+side+'-chev').classList.remove('rotate-180');
+  volConvert();volRenderGrid();
+}
+function volFilterGroup(g){
+  volGroup=g;
+  document.querySelectorAll('.vgtab').forEach(b=>{const a=b.dataset.group===g;
+    b.className=a?'vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all'
+    :'vgtab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all';});
+  volRenderGrid();
+}
+function volRenderGrid(){
+  const q=(document.getElementById('vol-unit-grid-search')?.value||'').toLowerCase();
+  const units=VOLUME_UNITS.filter(u=>(volGroup==='all'||u.group===volGroup)&&(!q||u.label.toLowerCase().includes(q)));
+  const grid=document.getElementById('vol-unit-grid');
+  const val=parseFloat(document.getElementById('vol-from-value')?.value)||1;
+  grid.innerHTML=units.map(u=>{const meta=VOLUME_GROUP_META[u.group];const result=convertVolume(val,volFromKey,u.key);const desc=VOLUME_UNIT_DESC[u.key];
+    return `<button onclick="navigate('/volume/${slug(u.key)}')" class="unit-card text-left p-3 rounded-xl border border-white/6 bg-dark-800/40 transition-all duration-200 group">
+      <div class="flex items-start justify-between mb-1.5"><span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors leading-tight">${u.label}</span>
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs ${meta.color} ml-2 flex-shrink-0">${u.symbol||meta.label.slice(0,3)}</span></div>
+      <p class="text-xs text-gray-600 leading-relaxed mb-2 line-clamp-1">${desc?desc.short:''}</p>
+      <div class="flex items-center justify-between"><span class="font-mono text-xs text-indigo-300">${fmtNum(result)} ${u.symbol||''}</span>
+      <span class="text-xs text-indigo-500/60 group-hover:text-indigo-400 transition-colors">View <i class="fa-solid fa-arrow-right text-xs ml-0.5"></i></span></div></button>`;}).join('');
+  const cnt=document.getElementById('vol-grid-count');if(cnt)cnt.textContent=`Showing ${units.length} unit${units.length!==1?'s':''}`;
+}
+function volRenderTable(){
+  const val=parseFloat(document.getElementById('vol-from-value')?.value)||0;
+  const tbody=document.getElementById('vol-ref-table');if(!tbody)return;
+  tbody.innerHTML=VOLUME_UNITS.map(u=>{const result=convertVolume(val,volFromKey,u.key);const meta=VOLUME_GROUP_META[u.group];const isFrom=u.key===volFromKey;
+    return `<tr class="result-row border-b border-white/3 transition-colors cursor-pointer" onclick="navigate('/volume/${slug(u.key)}')">
+      <td class="px-4 sm:px-5 py-2.5"><div class="flex items-center gap-2">${isFrom?'<i class="fa-solid fa-arrow-right text-indigo-400 text-xs"></i>':''}<span class="text-sm text-gray-200 ${isFrom?'font-semibold text-indigo-300':''}">${u.label}${u.symbol?' ['+u.symbol+']':''}</span></div></td>
+      <td class="px-3 py-2.5 hidden sm:table-cell"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${meta.color}">${meta.label}</span></td>
+      <td class="px-4 sm:px-5 py-2.5 text-right"><span class="font-mono text-sm ${isFrom?'text-indigo-300 font-semibold':'text-gray-300'}">${fmtNum(result)}</span></td>
+      <td class="px-3 py-2.5"><i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-700 hover:text-indigo-400 transition-colors"></i></td>
+    </tr>`;}).join('');
+}
+function volInitOutsideClick(){
+  document.addEventListener('click',function handler(e){
+    if(!document.getElementById('vol-from-wrap')&&!document.getElementById('vol-to-wrap')){document.removeEventListener('click',handler);return;}
+    ['from','to'].forEach(s=>{const w=document.getElementById('vol-'+s+'-wrap'),d=document.getElementById('vol-'+s+'-drop');
+      if(w&&d&&!w.contains(e.target)){d.classList.remove('open');const c=document.getElementById('vol-'+s+'-chev');if(c)c.classList.remove('rotate-180');}});});
+}
+
+// ================================================================
+//  VOLUME UNIT DETAIL PAGE
+// ================================================================
+let volUnitFromKey='';
+let volUnitToKey='';
+let volUnitConvGroup='all';
+
+function renderVolumeUnitPage(key){
+  updateNavActive('volume');
+  const unit=getVolumeUnit(key);if(!unit){navigate('/volume');return;}
+  const desc=VOLUME_UNIT_DESC[key]||{short:`Unit of volume: ${unit.label}`,long:`The ${unit.label} is a unit of volume.`};
+  const meta=VOLUME_GROUP_META[unit.group];
+  const related=VOLUME_UNITS.filter(u=>u.group===unit.group&&u.key!==key).slice(0,6);
+  volUnitFromKey=key;
+  volUnitToKey=VOLUME_UNITS.find(u=>u.key!==key)?.key||'liter';
+  updateSEO({title:`${unit.label} Converter | Omni Converter`,description:`Convert ${unit.label}${unit.symbol?' ('+unit.symbol+')':''} to other volume units. ${desc.short}`,url:`https://www.omniconverter.cyou/volume/${slug(key)}`});
+  const root=document.getElementById('app-root');
+  root.innerHTML=`<div class="page-fade">
+    <nav class="flex items-center gap-2 text-xs text-gray-600 mb-5">
+      <button onclick="navigate('/')" class="hover:text-indigo-400 transition-colors">Omni Converter</button>
+      <i class="fa-solid fa-chevron-right text-gray-700 text-xs"></i>
+      <button onclick="navigate('/volume')" class="hover:text-indigo-400 transition-colors">Volume</button>
+      <i class="fa-solid fa-chevron-right text-gray-700 text-xs"></i>
+      <span class="text-gray-400">${unit.label}</span>
+    </nav>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/50 backdrop-blur-sm p-5 sm:p-7 mb-6">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+        <div><div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${meta.color} border border-current/20"><i class="fa-solid ${meta.icon} mr-1.5 text-xs"></i>${meta.label}</span>
+          ${unit.symbol?`<span class="font-mono text-xs text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">${unit.symbol}</span>`:''}
+        </div><h2 class="text-2xl sm:text-4xl font-bold text-white tracking-tight mb-1">${unit.label} Converter</h2><p class="text-gray-400 text-sm leading-relaxed max-w-xl">${desc.short}</p></div>
+        <div class="text-right"><p class="text-xs text-gray-600 mb-1">Base value in m³</p><p class="font-mono text-lg text-indigo-300 font-semibold">${unit.factor<1e-15||unit.factor>1e12?unit.factor.toExponential(6):unit.factor} m³</p></div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/5">
+        <div class="bg-dark-800/60 rounded-xl p-3"><p class="text-xs text-gray-600 mb-1">SI Base (m³)</p><p class="font-mono text-xs text-white truncate">${unit.factor<1e-15||unit.factor>1e12?unit.factor.toExponential(4):unit.factor}</p></div>
+        <div class="bg-dark-800/60 rounded-xl p-3"><p class="text-xs text-gray-600 mb-1">Category</p><p class="text-xs text-white">${meta.label}</p></div>
+        <div class="bg-dark-800/60 rounded-xl p-3"><p class="text-xs text-gray-600 mb-1">Symbol</p><p class="font-mono text-xs text-white">${unit.symbol||'—'}</p></div>
+        <div class="bg-dark-800/60 rounded-xl p-3"><p class="text-xs text-gray-600 mb-1">In Liters</p><p class="font-mono text-xs text-white truncate">${fmtNum(convertVolume(1,key,'liter'))}</p></div>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/60 backdrop-blur-sm shadow-glow p-4 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-4"><i class="fa-solid fa-arrows-rotate text-indigo-400 mr-2"></i>Quick Converter</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+        <div><label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">From (${unit.label})</label>
+          <div class="relative"><input id="vou-from-val" type="text" inputmode="decimal" value="1" step="any"
+            class="converter-input w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-xl font-semibold text-white font-mono transition-all hover:border-indigo-500/30"
+            placeholder="Enter value" oninput="vouConvert()" />
+            ${unit.symbol?`<span class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400 font-mono text-sm">${unit.symbol}</span>`:''}
+          </div>
+        </div>
+        <div><label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">To Unit</label>
+          <div id="vou-to-wrap"><button id="vou-to-btn" onclick="vouToggleDrop()"
+            class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white text-left flex items-center justify-between hover:border-indigo-500/30 transition-all">
+            <span id="vou-to-label"></span><i class="fa-solid fa-chevron-down text-indigo-400 text-xs transition-transform duration-200" id="vou-to-chev"></i></button>
+            <div id="vou-to-drop" class="unit-drop-panel mt-1 rounded-xl border border-white/10 bg-dark-800/98 backdrop-blur-xl shadow-xl overflow-hidden">
+              <div class="p-2 border-b border-white/5"><input id="vou-to-search" type="text" placeholder="Search units…" class="w-full bg-dark-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 border border-white/5 focus:outline-none focus:border-indigo-500/40" oninput="vouBuildList()" /></div>
+              <div id="vou-to-list" class="search-dropdown py-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-dark-800/70 border border-white/8 rounded-xl p-4 mb-3">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs text-gray-600 uppercase tracking-wider">Result</span>
+          <button onclick="vouCopy()" class="text-xs text-gray-600 hover:text-indigo-400 transition-colors flex items-center gap-1"><i class="fa-regular fa-copy text-xs" id="vou-copy-icon"></i> Copy</button>
+        </div>
+        <div class="flex items-baseline gap-2 flex-wrap"><span id="vou-result" class="font-mono text-3xl font-bold text-indigo-300 num-shimmer"></span><span id="vou-result-sym" class="font-mono text-lg text-indigo-400/60"></span></div>
+        <p id="vou-formula" class="text-xs text-gray-600 font-mono mt-2"></p>
+      </div>
+      <div class="flex items-center justify-between">
+        <button onclick="vouSwap()" class="swap-btn group flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-600/15 border border-indigo-500/25 text-indigo-400 text-sm font-medium hover:bg-indigo-600/25 transition-all">
+          <i class="fa-solid fa-arrow-right-arrow-left swap-icon text-xs"></i>Swap
+        </button>
+        <button onclick="navigate('/volume')" class="flex items-center gap-1.5 text-xs text-gray-600 hover:text-indigo-400 transition-colors"><i class="fa-solid fa-table text-xs"></i>All units</button>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/40 p-5 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-3"><i class="fa-solid fa-circle-info text-indigo-400 mr-2"></i>About the ${unit.label}</h2>
+      <p class="text-gray-400 text-sm leading-relaxed">${desc.long}</p>
+    </div>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/40 backdrop-blur-sm overflow-hidden mb-6">
+      <div class="p-4 sm:p-5 border-b border-white/5 flex flex-wrap items-center justify-between gap-3">
+        <div><h2 class="text-base font-semibold text-white">1 ${unit.label} Equals…</h2><p class="text-xs text-gray-600 mt-0.5">Complete conversion table</p></div>
+        <div class="flex flex-wrap gap-1.5" id="vou-ct-tabs">
+          <button onclick="vouFilterGroup('all')" data-group="all" class="vouctab active text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all">All</button>
+          <button onclick="vouFilterGroup('metric')" data-group="metric" class="vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Metric</button>
+          <button onclick="vouFilterGroup('imperial')" data-group="imperial" class="vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Imperial</button>
+          <button onclick="vouFilterGroup('uk')" data-group="uk" class="vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">UK</button>
+          <button onclick="vouFilterGroup('historical')" data-group="historical" class="vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all">Historical</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/5">
+        <th class="text-left px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit</th>
+        <th class="text-left px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Symbol</th>
+        <th class="text-right px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">1 ${unit.symbol||unit.label} =</th>
+        <th class="px-3 py-3 w-10"></th>
+      </tr></thead><tbody id="vou-conv-table"></tbody></table></div>
+    </div>
+    ${related.length>0?`<div class="mb-6"><h2 class="text-base font-semibold text-white mb-3"><i class="fa-solid fa-link text-indigo-400 mr-2"></i>Related ${meta.label} Units</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        ${related.map(u=>{const r=convertVolume(1,key,u.key);return `<a href="/volume/${slug(u.key)}" class="unit-card text-left p-3 rounded-xl border border-white/6 bg-dark-800/40 transition-all duration-200 group">
+          <p class="text-xs font-medium text-gray-300 group-hover:text-white transition-colors mb-1 truncate">${u.label}</p>
+          ${u.symbol?`<p class="font-mono text-xs text-indigo-400 mb-1">${u.symbol}</p>`:''}
+          <p class="font-mono text-xs text-gray-600">${fmtNum(r)}</p></a>`;}).join('')}
+      </div></div>`:''
+    }
+    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-1">Convert ${unit.label} to Other Volume Units</h2>
+      <p class="text-xs text-gray-600 mb-4">Direct conversion pages</p>
+      <div class="flex flex-wrap gap-2">
+        ${VOLUME_UNITS.filter(u=>u.key!==key).sort((a,b)=>a.label.localeCompare(b.label)).map(u=>`<a href="/volume/${slug(key)}-to-${slug(u.key)}" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-dark-800/60 border border-white/5 text-xs text-gray-400 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">${unit.label} → ${u.label}</a>`).join('')}
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    ${buildUnitFaqHtml(unit, desc, 'volume')}
+  </div>`;
+  document.getElementById('vou-to-label').textContent=volUnitLabel(getVolumeUnit(volUnitToKey));
+  vouRenderConvTable('all'); vouConvert(); vouInitOutsideClick();
+}
+
+function vouConvert(){
+  const raw=parseFloat(document.getElementById('vou-from-val').value);const val=isNaN(raw)?0:raw;
+  const result=convertVolume(val,volUnitFromKey,volUnitToKey);const toUnit=getVolumeUnit(volUnitToKey);const frUnit=getVolumeUnit(volUnitFromKey);
+  document.getElementById('vou-result').textContent=fmtNum(result);document.getElementById('vou-result-sym').textContent=toUnit.symbol||toUnit.label;
+  document.getElementById('vou-formula').textContent=`1 ${frUnit.label} = ${fmtNum(convertVolume(1,volUnitFromKey,volUnitToKey))} ${toUnit.label}`;
+}
+function vouCopy(){const val=document.getElementById('vou-result').textContent;if(!val||val==='—')return;
+  navigator.clipboard.writeText(val).catch(()=>{});const icon=document.getElementById('vou-copy-icon');
+  icon.className='fa-solid fa-circle-check text-emerald-400 text-xs';showToast('Copied!');setTimeout(()=>{icon.className='fa-regular fa-copy text-xs';},2000);}
+function vouSwap(){const tmp=volUnitFromKey;volUnitFromKey=volUnitToKey;volUnitToKey=tmp;
+  const rv=document.getElementById('vou-result').textContent;if(rv&&rv!=='—')document.getElementById('vou-from-val').value=rv;
+  document.getElementById('vou-to-label').textContent=volUnitLabel(getVolumeUnit(volUnitToKey));vouConvert();vouRenderConvTable(volUnitConvGroup);}
+function vouToggleDrop(){const drop=document.getElementById('vou-to-drop'),chev=document.getElementById('vou-to-chev');
+  const isOpen=drop.classList.contains('open');if(!isOpen){drop.classList.add('open');chev.classList.add('rotate-180');vouBuildList();setTimeout(()=>document.getElementById('vou-to-search').focus(),50);}
+  else{drop.classList.remove('open');chev.classList.remove('rotate-180');}}
+function vouBuildList(){const q=(document.getElementById('vou-to-search').value||'').toLowerCase();
+  const con=document.getElementById('vou-to-list');con.innerHTML='';
+  const groups=['metric','imperial','uk','scientific','historical'];const grouped={};groups.forEach(g=>grouped[g]=[]);
+  VOLUME_UNITS.filter(u=>!q||u.label.toLowerCase().includes(q)).forEach(u=>{if(grouped[u.group])grouped[u.group].push(u);});
+  let any=false;
+  groups.forEach(g=>{if(!grouped[g].length)return;any=true;
+    const meta=VOLUME_GROUP_META[g];const hd=document.createElement('div');hd.className='px-3 pt-2 pb-1';
+    hd.innerHTML=`<span class="text-xs font-semibold uppercase tracking-widest ${meta.color.split(' ')[1]} opacity-70">${meta.label}</span>`;con.appendChild(hd);
+    grouped[g].forEach(u=>{const cur=volUnitToKey===u.key;
+      const btn=document.createElement('button');btn.className=`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-indigo-500/10 ${cur?'text-indigo-400 bg-indigo-500/8 font-medium':'text-gray-300'}`;
+      btn.textContent=volUnitLabel(u);btn.onclick=()=>{volUnitToKey=u.key;document.getElementById('vou-to-label').textContent=volUnitLabel(u);document.getElementById('vou-to-drop').classList.remove('open');document.getElementById('vou-to-chev').classList.remove('rotate-180');vouConvert();};con.appendChild(btn);});});
+  if(!any)con.innerHTML='<div class="px-3 py-4 text-sm text-gray-600 text-center">No units found</div>';}
+function vouFilterGroup(g){volUnitConvGroup=g;
+  document.querySelectorAll('.vouctab').forEach(b=>{const a=b.dataset.group===g;
+    b.className=a?'vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all':'vouctab text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800/80 text-gray-500 border border-white/5 hover:text-gray-300 hover:border-white/10 transition-all';});
+  vouRenderConvTable(g);}
+function vouRenderConvTable(group){const tbody=document.getElementById('vou-conv-table');if(!tbody)return;
+  const units=VOLUME_UNITS.filter(u=>u.key!==volUnitFromKey&&(group==='all'||u.group===group));
+  tbody.innerHTML=units.map(u=>{const meta=VOLUME_GROUP_META[u.group];const result=convertVolume(1,volUnitFromKey,u.key);
+    return `<tr class="result-row border-b border-white/3 cursor-pointer" onclick="navigate('/volume/${slug(u.key)}')">
+      <td class="px-4 sm:px-5 py-2.5"><span class="text-sm text-gray-200">${u.label}</span></td>
+      <td class="px-3 py-2.5 hidden sm:table-cell"><span class="font-mono text-xs text-gray-500">${u.symbol||'—'}</span></td>
+      <td class="px-4 sm:px-5 py-2.5 text-right"><span class="font-mono text-sm text-gray-300">${fmtNum(result)}</span></td>
+      <td class="px-3 py-2.5"><span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs ${meta.color}">${meta.label.slice(0,3)}</span></td>
+    </tr>`;}).join('');}
+function vouInitOutsideClick(){document.addEventListener('click',function handler(e){
+  const w=document.getElementById('vou-to-wrap'),d=document.getElementById('vou-to-drop');
+  if(!w){document.removeEventListener('click',handler);return;}
+  if(!w.contains(e.target)){d.classList.remove('open');const c=document.getElementById('vou-to-chev');if(c)c.classList.remove('rotate-180');}});}
+
+// ================================================================
+//  VOLUME CONVERSION PAIR PAGE  e.g. /volume/liter-to-gallon-us
+// ================================================================
+function renderVolumeConversionPage(fromKey,toKey){
+  updateNavActive('volume');
+  const fromUnit=getVolumeUnit(fromKey),toUnit=getVolumeUnit(toKey);
+  if(!fromUnit||!toUnit){navigate('/volume');return;}
+  const fromDesc=VOLUME_UNIT_DESC[fromKey]||{short:`Unit of volume: ${fromUnit.label}`,long:`The ${fromUnit.label} is a unit of volume.`};
+  const toDesc=VOLUME_UNIT_DESC[toKey]||{short:`Unit of volume: ${toUnit.label}`,long:`The ${toUnit.label} is a unit of volume.`};
+  const fromMeta=VOLUME_GROUP_META[fromUnit.group],toMeta=VOLUME_GROUP_META[toUnit.group];
+  const factor=convertVolume(1,fromKey,toKey);
+  updateSEO({title:`Convert ${fromUnit.label} to ${toUnit.label} | Omni Converter`,
+    description:`Instantly convert ${fromUnit.label} to ${toUnit.label}. 1 ${fromUnit.label} = ${fmtNum(factor)} ${toUnit.label}. Free online volume converter.`,
+    url:`https://www.omniconverter.cyou/volume/${slug(fromKey)}-to-${slug(toKey)}`});
+  const commonVals=[0.001,0.01,0.1,0.5,1,2,5,10,20,50,100,500,1000,10000];
+  const root=document.getElementById('app-root');
+  root.innerHTML=`<div class="page-fade">
+    <nav class="flex items-center gap-2 text-xs text-gray-600 mb-5 flex-wrap">
+      <button onclick="navigate('/')" class="hover:text-indigo-400 transition-colors">Omni Converter</button>
+      <i class="fa-solid fa-chevron-right text-gray-700 text-xs"></i>
+      <button onclick="navigate('/volume')" class="hover:text-indigo-400 transition-colors">Volume</button>
+      <i class="fa-solid fa-chevron-right text-gray-700 text-xs"></i>
+      <button onclick="navigate('/volume/${slug(fromKey)}')" class="hover:text-indigo-400 transition-colors">${fromUnit.label}</button>
+      <i class="fa-solid fa-chevron-right text-gray-700 text-xs"></i>
+      <span class="text-gray-400">${fromUnit.label} to ${toUnit.label}</span>
+    </nav>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/50 backdrop-blur-sm p-5 sm:p-7 mb-6">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${fromMeta.color} border border-current/20"><i class="fa-solid ${fromMeta.icon} mr-1.5 text-xs"></i>${fromMeta.label}</span>
+        <i class="fa-solid fa-arrow-right text-gray-600 text-xs"></i>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${toMeta.color} border border-current/20"><i class="fa-solid ${toMeta.icon} mr-1.5 text-xs"></i>${toMeta.label}</span>
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-bold text-white tracking-tight mb-2">Convert ${fromUnit.label} to ${toUnit.label}</h2>
+      <p class="text-gray-400 text-sm leading-relaxed max-w-2xl mb-5">Instantly convert ${fromUnit.label}${fromUnit.symbol?' ('+fromUnit.symbol+')':''} to ${toUnit.label}${toUnit.symbol?' ('+toUnit.symbol+')':''}. Enter any value for real-time results.</p>
+      <div class="inline-flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/25">
+        <div class="text-center"><p class="text-2xl font-bold font-mono text-white">1</p><p class="text-xs text-gray-500 mt-0.5">${fromUnit.label}</p>${fromUnit.symbol?`<p class="font-mono text-xs text-indigo-400">${fromUnit.symbol}</p>`:''}</div>
+        <i class="fa-solid fa-equals text-indigo-400 text-xl"></i>
+        <div class="text-center"><p class="text-2xl font-bold font-mono text-indigo-300">${fmtNum(factor)}</p><p class="text-xs text-gray-500 mt-0.5">${toUnit.label}</p>${toUnit.symbol?`<p class="font-mono text-xs text-indigo-400">${toUnit.symbol}</p>`:''}</div>
+      </div>
+    </div>
+    <!-- Live Converter -->
+    <div class="rounded-2xl border border-white/8 bg-dark-700/60 backdrop-blur-sm shadow-glow p-4 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-4"><i class="fa-solid fa-arrows-rotate text-indigo-400 mr-2"></i>${fromUnit.label} to ${toUnit.label} Converter</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div><label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">${fromUnit.label}${fromUnit.symbol?' ('+fromUnit.symbol+')':''}</label>
+          <div class="relative"><input id="vcp-from" type="text" inputmode="decimal" value="1" step="any"
+            class="converter-input w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-2xl font-bold text-white font-mono transition-all hover:border-indigo-500/30"
+            placeholder="Enter value" oninput="vcpConvert()" />
+            ${fromUnit.symbol?`<span class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400 font-mono text-sm pointer-events-none">${fromUnit.symbol}</span>`:''}
+          </div>
+        </div>
+        <div><label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">${toUnit.label}${toUnit.symbol?' ('+toUnit.symbol+')':''}</label>
+          <div class="relative"><input id="vcp-to" type="text" step="any" readonly
+            class="converter-input w-full bg-dark-800/50 border border-indigo-500/20 rounded-xl px-4 py-3 text-2xl font-bold text-indigo-300 font-mono cursor-default" placeholder="Result" />
+            ${toUnit.symbol?`<span class="absolute right-10 top-1/2 -translate-y-1/2 text-indigo-400/60 font-mono text-sm pointer-events-none">${toUnit.symbol}</span>`:''}
+            <button onclick="vcpCopy()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-indigo-400 transition-colors"><i class="fa-regular fa-copy text-sm" id="vcp-copy-icon"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-dark-800/80 border border-white/5 text-xs text-gray-500 mb-4">
+        <i class="fa-solid fa-function text-indigo-500/60 flex-shrink-0"></i>
+        <span class="font-mono truncate" id="vcp-formula">1 ${fromUnit.label} × ${fmtNum(factor)} = ${fmtNum(factor)} ${toUnit.label}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <button onclick="vcpSwap()" class="swap-btn group flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-600/15 border border-indigo-500/25 text-indigo-400 text-sm font-medium hover:bg-indigo-600/25 transition-all">
+          <i class="fa-solid fa-arrow-right-arrow-left swap-icon text-xs"></i>Swap
+        </button>
+        <button onclick="navigate('/volume/${slug(toKey)}-to-${slug(fromKey)}')" class="text-xs text-gray-600 hover:text-indigo-400 transition-colors">
+          <i class="fa-solid fa-rotate text-xs mr-1"></i>Reverse: ${toUnit.label} → ${fromUnit.label}
+        </button>
+      </div>
+    </div>
+    <!-- Conversion Table -->
+    <div class="rounded-2xl border border-white/8 bg-dark-700/40 backdrop-blur-sm overflow-hidden mb-6">
+      <div class="p-4 sm:p-5 border-b border-white/5"><h2 class="text-base font-semibold text-white">${fromUnit.label} to ${toUnit.label} Table</h2><p class="text-xs text-gray-600 mt-0.5">Common ${fromUnit.label} values and their ${toUnit.label} equivalents</p></div>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/5">
+        <th class="text-left px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">${fromUnit.label}${fromUnit.symbol?' ('+fromUnit.symbol+')':''}</th>
+        <th class="text-center px-3 py-3 text-gray-700"><i class="fa-solid fa-arrow-right"></i></th>
+        <th class="text-right px-4 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">${toUnit.label}${toUnit.symbol?' ('+toUnit.symbol+')':''}</th>
+      </tr></thead><tbody>
+        ${commonVals.map((v,i)=>`<tr class="${i%2===0?'bg-dark-800/20':''} border-b border-white/3 hover:bg-indigo-500/5 transition-colors">
+          <td class="px-4 sm:px-5 py-2.5 font-mono text-sm text-gray-300">${v} ${fromUnit.symbol||fromUnit.label}</td>
+          <td class="px-3 py-2.5 text-center text-gray-700"><i class="fa-solid fa-arrow-right text-xs"></i></td>
+          <td class="px-4 sm:px-5 py-2.5 font-mono text-sm text-indigo-300 text-right">${fmtNum(convertVolume(v,fromKey,toKey))} ${toUnit.symbol||toUnit.label}</td>
+        </tr>`).join('')}
+      </tbody></table></div>
+    </div>
+    <!-- Formula -->
+    <div class="rounded-2xl border border-white/8 bg-dark-700/40 p-5 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-4"><i class="fa-solid fa-function text-indigo-400 mr-2"></i>How to Convert ${fromUnit.label} to ${toUnit.label}</h2>
+      <p class="text-gray-400 text-sm leading-relaxed mb-4">Multiply the value in <strong class="text-white">${fromUnit.label}</strong> by <strong class="font-mono text-indigo-300">${fmtNum(factor)}</strong>.</p>
+      <div class="bg-dark-800/70 border border-white/8 rounded-xl p-4 font-mono text-sm mb-4">
+        <span class="text-indigo-300">${toUnit.symbol||toUnit.label}</span><span class="text-gray-500"> = </span><span class="text-white">${fromUnit.symbol||fromUnit.label}</span><span class="text-gray-500"> × </span><span class="text-emerald-400">${fmtNum(factor)}</span>
+      </div>
+      <p class="text-gray-400 text-sm"><strong class="text-white">Example:</strong> 5 ${fromUnit.label} = <span class="font-mono text-indigo-300">${fmtNum(convertVolume(5,fromKey,toKey))} ${toUnit.symbol||toUnit.label}</span></p>
+    </div>
+    <!-- About both units -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div class="rounded-2xl border border-white/8 bg-dark-700/40 p-5">
+        <div class="flex items-center gap-2 mb-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${fromMeta.color} border border-current/20">${fromUnit.label}</span></div>
+        <h2 class="text-sm font-semibold text-white mb-2">About the ${fromUnit.label}</h2>
+        <p class="text-gray-500 text-xs leading-relaxed">${fromDesc.long}</p>
+        <button onclick="navigate('/volume/${slug(fromKey)}')" class="mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Full ${fromUnit.label} converter <i class="fa-solid fa-arrow-right text-xs ml-0.5"></i></button>
+      </div>
+      <div class="rounded-2xl border border-white/8 bg-dark-700/40 p-5">
+        <div class="flex items-center gap-2 mb-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${toMeta.color} border border-current/20">${toUnit.label}</span></div>
+        <h2 class="text-sm font-semibold text-white mb-2">About the ${toUnit.label}</h2>
+        <p class="text-gray-500 text-xs leading-relaxed">${toDesc.long}</p>
+        <button onclick="navigate('/volume/${slug(toKey)}')" class="mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Full ${toUnit.label} converter <i class="fa-solid fa-arrow-right text-xs ml-0.5"></i></button>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-white/8 bg-dark-700/30 p-5 sm:p-6 mb-6">
+      <h2 class="text-base font-semibold text-white mb-1">Convert ${fromUnit.label} to Other Volume Units</h2>
+      <p class="text-xs text-gray-600 mb-4">Direct conversion pages from ${fromUnit.label}</p>
+      <div class="flex flex-wrap gap-2">
+        ${VOLUME_UNITS.filter(u=>u.key!==fromKey&&u.key!==toKey).sort((a,b)=>a.label.localeCompare(b.label)).map(u=>`<a href="/volume/${slug(fromKey)}-to-${slug(u.key)}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-dark-800/60 border border-white/5 text-xs text-gray-400 hover:text-indigo-400 hover:border-indigo-500/30 transition-all">${fromUnit.label} to ${u.label}</a>`).join('')}
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    ${buildConvFaqHtml(fromUnit, toUnit, factor, convertVolume(1, toKey, fromKey), 'volume')}
+  </div>`;
+  window._vcpFrom=fromKey;window._vcpTo=toKey;vcpConvert();
+}
+
+function vcpConvert(){
+  const raw=parseFloat(document.getElementById('vcp-from')?.value);const val=isNaN(raw)?0:raw;
+  const from=window._vcpFrom,to=window._vcpTo;if(!from||!to)return;
+  const result=convertVolume(val,from,to);const toUnit=getVolumeUnit(to);const frUnit=getVolumeUnit(from);if(!toUnit||!frUnit)return;
+  document.getElementById('vcp-to').value=fmtNum(result);
+  const f1=convertVolume(1,from,to);document.getElementById('vcp-formula').textContent=`1 ${frUnit.label} × ${fmtNum(f1)} = ${fmtNum(val*f1)} ${toUnit.label}`;
+}
+function vcpCopy(){const val=document.getElementById('vcp-to').value;if(!val||val==='—')return;
+  navigator.clipboard.writeText(val).catch(()=>{});const icon=document.getElementById('vcp-copy-icon');
+  icon.className='fa-solid fa-circle-check text-emerald-400 text-sm';showToast('Copied to clipboard');setTimeout(()=>{icon.className='fa-regular fa-copy text-sm';},2000);}
+function vcpSwap(){navigate('/volume/'+slug(window._vcpTo)+'-to-'+slug(window._vcpFrom));}
 
 // ================================================================
 //  AREA CONVERTER PAGE

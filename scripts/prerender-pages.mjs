@@ -55,10 +55,12 @@ function extractConvFactor(constName, fromKey, toKey) {
   return null; // Skip inline factor computation in prerender — use generic desc
 }
 
-const LENGTH_UNITS = extractUnits('LENGTH_UNITS');
-const AREA_UNITS   = extractUnits('AREA_UNITS');
-const UNIT_DESC    = extractDescriptions('UNIT_DESC');
-const AREA_UNIT_DESC = extractDescriptions('AREA_UNIT_DESC');
+const LENGTH_UNITS  = extractUnits('LENGTH_UNITS');
+const AREA_UNITS    = extractUnits('AREA_UNITS');
+const VOLUME_UNITS  = extractUnits('VOLUME_UNITS');
+const UNIT_DESC     = extractDescriptions('UNIT_DESC');
+const AREA_UNIT_DESC  = extractDescriptions('AREA_UNIT_DESC');
+const VOLUME_UNIT_DESC = extractDescriptions('VOLUME_UNIT_DESC');
 
 function slug(key) { return key.replace(/_/g, '-'); }
 function keyFromSlug(s) { return s.replace(/-/g, '_'); }
@@ -169,6 +171,47 @@ function getSEO(routePath) {
       return {
         title: `${unit.label} Converter | Omni Converter`,
         description: `Convert ${unit.label}${unit.symbol ? ' (' + unit.symbol + ')' : ''} to other area units.${desc ? ' ' + desc : ''}`,
+        url: abs
+      };
+    }
+  }
+
+  // /volume
+  if (parts[0] === 'volume' && parts.length === 1) {
+    return {
+      title: 'Volume Converter — 80+ Units | Omni Converter',
+      description: 'Free online volume converter. Convert between 80+ units including metric, imperial, UK, and historical volume units. Instant results.',
+      url: abs
+    };
+  }
+
+  // /volume/{from}-to-{to}
+  if (parts[0] === 'volume' && parts[1] && parts[1].includes('-to-')) {
+    const idx      = parts[1].indexOf('-to-');
+    const fromSlug = parts[1].slice(0, idx);
+    const toSlug   = parts[1].slice(idx + 4);
+    const fromKey  = keyFromSlug(fromSlug);
+    const toKey    = keyFromSlug(toSlug);
+    const fromUnit = VOLUME_UNITS.find(u => u.key === fromKey);
+    const toUnit   = VOLUME_UNITS.find(u => u.key === toKey);
+    if (fromUnit && toUnit) {
+      return {
+        title: `Convert ${fromUnit.label} to ${toUnit.label} | ${fromUnit.symbol || fromUnit.label} to ${toUnit.symbol || toUnit.label} Converter | Omni Converter`,
+        description: `Instantly convert ${fromUnit.label}${fromUnit.symbol ? ' (' + fromUnit.symbol + ')' : ''} to ${toUnit.label}${toUnit.symbol ? ' (' + toUnit.symbol + ')' : ''}. Free online volume converter with formula and conversion table.`,
+        url: abs
+      };
+    }
+  }
+
+  // /volume/{unit}
+  if (parts[0] === 'volume' && parts[1]) {
+    const key  = keyFromSlug(parts[1]);
+    const unit = VOLUME_UNITS.find(u => u.key === key);
+    if (unit) {
+      const desc = VOLUME_UNIT_DESC[key] || '';
+      return {
+        title: `${unit.label} Converter — Convert ${unit.label}${unit.symbol ? ' (' + unit.symbol + ')' : ''} | Omni Converter`,
+        description: `Convert ${unit.label}${unit.symbol ? ' (' + unit.symbol + ')' : ''} to liters, gallons, cubic meters and 80+ other volume units.${desc ? ' ' + desc : ''}`,
         url: abs
       };
     }
